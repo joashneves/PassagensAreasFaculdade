@@ -8,6 +8,7 @@ namespace PassagensAreas.Domain.Models
     {
         public long Id { get; set; }
         public string Nome { get; set; }
+        public string CPF { get; set; }
         public string Endereco { get; set; }
         public int Numero_telefone { get; set; }
         public int Numero_telefone_fixo { get; set; }

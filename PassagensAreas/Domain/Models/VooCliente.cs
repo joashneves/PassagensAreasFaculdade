@@ -7,7 +7,7 @@
         public string Destino { get; set; }
         public DateOnly Datas { get; set; }
         public DateOnly Ida { get; set; }
-        public DateOnly Volta { get; set; }
+        public DateOnly? Volta { get; set; }
         public float Preco { get; set; }
         public string Companhias { get; set; }
         public int QuantidadeMaximaPassageiros {  get; set; }

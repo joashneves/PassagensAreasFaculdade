@@ -8,6 +8,8 @@ namespace Infraestrutura
     public class VooContext : DbContext
     {
         private IConfiguration _configuration;
+        internal readonly object ReservaDePassagemSet;
+
         public DbSet<VooCliente> VooSet { get; set; }
 
         public VooContext(IConfiguration configuration, DbContextOptions<VooContext> options)

@@ -24,6 +24,8 @@ builder.Services.AddDbContext<AssentoContext>(opt =>
     opt.UseInMemoryDatabase("AssentoList"));
 builder.Services.AddDbContext<VendaContext>(opt =>
     opt.UseInMemoryDatabase("VendaList"));
+builder.Services.AddDbContext<CheckInContext>(opt =>
+    opt.UseInMemoryDatabase("ChekinList"));
 
 var app = builder.Build();
 

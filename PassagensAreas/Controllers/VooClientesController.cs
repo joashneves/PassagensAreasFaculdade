@@ -20,9 +20,12 @@ namespace PassagensAreas.Controllers
         private readonly CheckInContext _contextCheckIn;
         private readonly ClienteContext _contextCliente;
 
-        public VooClientesController(VooContext context)
+        public VooClientesController(VooContext context, ReservaDePassagemContext contextReserva, CheckInContext contextChekin, ClienteContext contextCliente)
         {
-            _context = context;
+            _context = context ?? throw new ArgumentNullException(nameof(context));
+            _contextReserva = contextReserva ?? throw new ArgumentNullException(nameof(contextReserva));
+            _contextCheckIn = contextChekin ?? throw new ArgumentNullException(nameof(contextChekin));
+            _contextCliente = contextCliente ?? throw new ArgumentNullException(nameof(contextCliente));
         }
         [HttpGet("consulta")]
         public async Task<ActionResult<IEnumerable<VooCliente>>> ConsultarVoos(
@@ -84,6 +87,7 @@ namespace PassagensAreas.Controllers
                 NumeroVoo = voo.NumeroVoo,
                 AssentosReservados = quantidadePassageiros
             };
+            Console.WriteLine(novaReserva.ToString());
 
             // Adiciona a reserva ao banco de dados
             _contextReserva.ReservaDePassagemSet.Add(novaReserva);

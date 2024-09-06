@@ -97,6 +97,7 @@ namespace PassagensAreas.Controllers
 
             // Salva as mudanças
             await _context.SaveChangesAsync();
+            await _contextReserva.SaveChangesAsync();
 
             return Ok("Reserva realizada com sucesso.");
         }
@@ -172,6 +173,7 @@ namespace PassagensAreas.Controllers
 
             // Salva as mudanças
             await _context.SaveChangesAsync();
+            await _contextCheckIn.SaveChangesAsync();
 
             return Ok("Check-in realizado com sucesso.");
         }
@@ -282,6 +284,7 @@ namespace PassagensAreas.Controllers
 
             // Salva as mudanças
             await _context.SaveChangesAsync();
+            await _contextReserva.SaveChangesAsync();
 
             return Ok("Reserva cancelada com sucesso.");
         }

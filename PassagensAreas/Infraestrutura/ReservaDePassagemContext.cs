@@ -16,12 +16,7 @@ namespace PassagensAreas.Infraestrutura
         }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-        {
-            // Se desejar usar o MySQL no futuro, deixe isso comentado
-            // var connectionString = _configuration.GetConnectionString("ClienteData");
-            // optionsBuilder.UseMySQL(connectionString);
-
-            // Configuração temporária para usar banco de dados em memória
+        {          
             optionsBuilder.UseInMemoryDatabase("ReservaDePassagemDataInMemory");
         }
     }

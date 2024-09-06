@@ -38,8 +38,8 @@ namespace Infraestrutura
 
             if (cliente != null)
             {
-                ClienteSet.AddRange(cliente); // Adiciona os voos no DbSet
-                SaveChanges(); // Salva as alterações no banco em memória
+                ClienteSet.AddRange(cliente); 
+                SaveChanges(); 
             }
         }
     }

@@ -3,12 +3,12 @@ using PassagensAreas.Domain.Models;
 
 namespace PassagensAreas.Infraestrutura
 {
-    public class AssentoContext : DbContext
+    public class VendaContext : DbContext
     {
         private IConfiguration _configuration;
-        public DbSet<Assento> AssentoSet { get; set; }
+        public DbSet<RelatorioVendas> VendaSet { get; set; }
 
-        public AssentoContext(IConfiguration configuration, DbContextOptions<AssentoContext> options)
+        public VendaContext(IConfiguration configuration, DbContextOptions<VendaContext> options)
             : base(options)
         {
             _configuration = configuration ?? throw new ArgumentNullException(nameof(configuration));
@@ -21,7 +21,8 @@ namespace PassagensAreas.Infraestrutura
             // optionsBuilder.UseMySQL(connectionString);
 
             // Configuração temporária para usar banco de dados em memória
-            optionsBuilder.UseInMemoryDatabase("AssentoDataInMemory");
+            optionsBuilder.UseInMemoryDatabase("VendaDataInMemory");
         }
+    
     }
 }

@@ -22,6 +22,8 @@ builder.Services.AddDbContext<ReservaDePassagemContext>(opt =>
     opt.UseInMemoryDatabase("ReservaDePassagemList"));
 builder.Services.AddDbContext<AssentoContext>(opt =>
     opt.UseInMemoryDatabase("AssentoList"));
+builder.Services.AddDbContext<VendaContext>(opt =>
+    opt.UseInMemoryDatabase("VendaList"));
 
 var app = builder.Build();
 

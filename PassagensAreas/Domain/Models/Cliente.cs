@@ -1,12 +1,15 @@
-﻿using System;
+﻿using Microsoft.EntityFrameworkCore;
+using System;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace PassagensAreas.Domain.Models
 {
-    [Table("Cliente")]
     public class Cliente
     {
-        public long Id { get; set; }
+        [Key] // Define o campo como chave primária
+        [DatabaseGenerated(DatabaseGeneratedOption.Identity)] // Gera o valor automaticamente
+        public int Id { get; set; }
         public string Nome { get; set; }
         public string CPF { get; set; }
         public string Endereco { get; set; }

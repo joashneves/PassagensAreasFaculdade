@@ -27,6 +27,14 @@ builder.Services.AddDbContext<VendaContext>(opt =>
 
 var app = builder.Build();
 
+using (var scope = app.Services.CreateScope())
+{
+    var contextVoo = scope.ServiceProvider.GetRequiredService<VooContext>();
+    var contextCLiente = scope.ServiceProvider.GetRequiredService<ClienteContext>();
+    contextVoo.InitializeData();
+    contextCLiente.InitializeData();
+}
+
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {

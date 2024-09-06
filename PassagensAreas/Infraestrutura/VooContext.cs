@@ -2,6 +2,7 @@
 using PassagensAreas.Domain.Models;
 using System;
 using Microsoft.Extensions.Configuration;
+using Newtonsoft.Json;
 
 namespace Infraestrutura
 {
@@ -20,12 +21,26 @@ namespace Infraestrutura
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
-            // Se desejar usar o MySQL no futuro, deixe isso comentado
-            // var connectionString = _configuration.GetConnectionString("ClienteData");
-            // optionsBuilder.UseMySQL(connectionString);
-
-            // Configuração temporária para usar banco de dados em memória
             optionsBuilder.UseInMemoryDatabase("VooDataInMemory");
+        }
+        public void InitializeData()
+        {
+            // Caminho para o arquivo JSON
+            var filePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Data", "VooInicial.json");
+
+            if (!File.Exists(filePath))
+            {
+                throw new FileNotFoundException($"Arquivo JSON não encontrado: {filePath}");
+            }
+
+            var jsonData = File.ReadAllText(filePath);
+            var voos = JsonConvert.DeserializeObject<List<VooCliente>>(jsonData);
+
+            if (voos != null)
+            {
+                VooSet.AddRange(voos); // Adiciona os voos no DbSet
+                SaveChanges(); // Salva as alterações no banco em memória
+            }
         }
     }
 }

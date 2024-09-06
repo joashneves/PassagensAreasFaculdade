@@ -1,0 +1,86 @@
+﻿[
+  {
+    "origem": "São Paulo",
+    "destino": "Rio de Janeiro",
+    "datas": "2024-09-06T12:57:03.832Z",
+    "ida": "2024-09-07T12:57:03.832Z",
+    "volta": "2024-09-14T12:57:03.832Z",
+    "preco": 500.00,
+    "companhias": "Companhia Aérea X",
+    "quantidadeMaximaPassageiros": 100,
+    "quantidadePassageiros": 50,
+    "numeroVoo": 12345
+  },
+  {
+    "origem": "São Paulo",
+    "destino": "Salvador",
+    "datas": "2024-09-06T12:57:03.832Z",
+    "ida": "2024-09-08T12:57:03.832Z",
+    "volta": "2024-09-15T12:57:03.832Z",
+    "preco": 600.00,
+    "companhias": "Companhia Aérea Y",
+    "quantidadeMaximaPassageiros": 120,
+    "quantidadePassageiros": 30,
+    "numeroVoo": 67890
+  },
+  {
+    "origem": "São Paulo",
+    "destino": "Curitiba",
+    "datas": "2024-09-07T10:30:00.000Z",
+    "ida": "2024-09-09T10:30:00.000Z",
+    "volta": "2024-09-16T10:30:00.000Z",
+    "preco": 400.00,
+    "companhias": "Companhia Aérea Z",
+    "quantidadeMaximaPassageiros": 90,
+    "quantidadePassageiros": 60,
+    "numeroVoo": 11223
+  },
+  {
+    "origem": "Rio de Janeiro",
+    "destino": "Fortaleza",
+    "datas": "2024-09-08T14:45:00.000Z",
+    "ida": "2024-09-10T14:45:00.000Z",
+    "volta": "2024-09-17T14:45:00.000Z",
+    "preco": 750.00,
+    "companhias": "Companhia Aérea W",
+    "quantidadeMaximaPassageiros": 110,
+    "quantidadePassageiros": 80,
+    "numeroVoo": 33445
+  },
+  {
+    "origem": "Salvador",
+    "destino": "Brasília",
+    "datas": "2024-09-09T16:00:00.000Z",
+    "ida": "2024-09-11T16:00:00.000Z",
+    "volta": "2024-09-18T16:00:00.000Z",
+    "preco": 550.00,
+    "companhias": "Companhia Aérea V",
+    "quantidadeMaximaPassageiros": 95,
+    "quantidadePassageiros": 40,
+    "numeroVoo": 55667
+  },
+  {
+    "origem": "Curitiba",
+    "destino": "Porto Alegre",
+    "datas": "2024-09-10T09:00:00.000Z",
+    "ida": "2024-09-12T09:00:00.000Z",
+    "volta": "2024-09-19T09:00:00.000Z",
+    "preco": 350.00,
+    "companhias": "Companhia Aérea U",
+    "quantidadeMaximaPassageiros": 80,
+    "quantidadePassageiros": 70,
+    "numeroVoo": 77889
+  },
+  {
+    "origem": "Fortaleza",
+    "destino": "São Paulo",
+    "datas": "2024-09-12T13:30:00.000Z",
+    "ida": "2024-09-14T13:30:00.000Z",
+    "volta": "2024-09-21T13:30:00.000Z",
+    "preco": 650.00,
+    "companhias": "Companhia Aérea T",
+    "quantidadeMaximaPassageiros": 105,
+    "quantidadePassageiros": 55,
+    "numeroVoo": 99100
+  }
+]

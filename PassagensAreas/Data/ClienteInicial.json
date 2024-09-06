@@ -1,0 +1,20 @@
+[
+  {
+    "id": 1,
+    "nome": "João Silva",
+    "cpf": "123.456.789-00",
+    "endereco": "Rua Exemplo, 123, Bairro, Cidade, Estado",
+    "numero_telefone": "11987654321",
+    "numero_telefone_fixo": "1134567890",
+    "email": "joao.silva@example.com"
+  },
+  {
+    "id": 2,
+    "nome": "Eduarda Oliveira",
+    "cpf": "123.456.189-00",
+    "endereco": "Rua Exemplo, 456, Bairro, Cidade, Estado",
+    "numero_telefone": "11987654322",
+    "numero_telefone_fixo": "1134567891",
+    "email": "eduarda.oliveira@example.com"
+  }
+]

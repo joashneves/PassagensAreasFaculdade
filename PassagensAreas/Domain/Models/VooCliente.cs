@@ -1,7 +1,12 @@
-﻿namespace PassagensAreas.Domain.Models
+﻿using System.ComponentModel.DataAnnotations.Schema;
+using System.ComponentModel.DataAnnotations;
+
+namespace PassagensAreas.Domain.Models
 {
     public class VooCliente
     {
+        [Key] // Define o campo como chave primária
+        [DatabaseGenerated(DatabaseGeneratedOption.Identity)] // Gera o valor automaticamente
         public int Id { get; set; }
         public string Origem { get; set; }
         public string Destino { get; set; }

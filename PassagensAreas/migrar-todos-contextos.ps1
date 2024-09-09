@@ -1,10 +1,10 @@
 $contexts = @(
+    "ClienteContext",
     "VooContext",
+    "BilheteContext",
     "ReservaDePassagemContext",
     "VendaContext",
-    "BilheteContext",
-    "CheckinContext",
-    "ReservaDePassagemContext"
+    "CheckInContext"
 )
 
 foreach ($context in $contexts) {

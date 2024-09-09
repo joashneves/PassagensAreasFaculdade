@@ -26,6 +26,12 @@ namespace Infraestrutura
         }
         public void InitializeData()
         {
+            // Verifica se já existem registros na tabela
+            if (VooSet.Any())
+            {
+                // Se houver registros, não faz nada
+                return;
+            }
             // Caminho para o arquivo JSON
             var filePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Data", "VooInicial.json");
 

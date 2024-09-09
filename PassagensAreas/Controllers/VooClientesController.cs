@@ -57,16 +57,18 @@ namespace PassagensAreas.Controllers
 
         [HttpPost("reservar")]
         public async Task<IActionResult> ReservarPassagem(
-        [FromBody] ReservaDePassagem reserva,
-        [FromQuery] int quantidadePassageiros)
+    [FromBody] ReservaDePassagem reserva,
+    [FromQuery] int quantidadePassageiros,
+    [FromQuery] string formaPagamento) // Adiciona o parâmetro formaPagamento
         {
             // Verifica se o voo existe
-            var voo = await _context.VooSet.FirstOrDefaultAsync(v => v.Id == reserva.Id_voo);
+            var voo = await _context.VooSet.FirstOrDefaultAsync(v => v.Id == reserva.Id_Voo);
 
             if (voo == null)
             {
                 return NotFound("Voo não encontrado.");
             }
+
             // Verifica se o CPF informado já existe no banco de dados
             var clienteExistente = await _contextCliente.ClienteSet
                 .FirstOrDefaultAsync(c => c.CPF == reserva.CPFCliente);
@@ -75,6 +77,7 @@ namespace PassagensAreas.Controllers
             {
                 return NotFound("CPF não encontrado. Por favor, registre-se antes de realizar a reserva.");
             }
+
             // Verifica se há assentos disponíveis
             int assentosDisponiveis = voo.QuantidadeMaximaPassageiros - voo.QuantidadePassageiros;
             if (assentosDisponiveis < quantidadePassageiros)
@@ -85,14 +88,20 @@ namespace PassagensAreas.Controllers
             // Atualiza a quantidade de passageiros no voo
             voo.QuantidadePassageiros += quantidadePassageiros;
 
+            // Define o valor fixo por passagem (exemplo: R$100,00)
+            decimal valorPorPassagem = 100.00m; // Valor fixo em reais
+            decimal totalArrecadado = valorPorPassagem * quantidadePassageiros;
+
             // Cria a reserva de passagem
             var novaReserva = new ReservaDePassagem
             {
-                Id_voo = voo.Id,
+                Id_Voo = voo.Id,
                 CPFCliente = reserva.CPFCliente,  // Assume-se que o CPF foi passado no body
-                DataReserva = (DateTime.Now),
+                DataReserva = DateTime.Now,
                 NumeroVoo = voo.NumeroVoo,
-                AssentosReservados = quantidadePassageiros
+                AssentosReservados = quantidadePassageiros,
+                FormaPagamento = formaPagamento,  // Adiciona a forma de pagamento
+                ValorTotal = totalArrecadado // Adiciona o valor total da reserva
             };
             Console.WriteLine(novaReserva.ToString());
 
@@ -108,6 +117,7 @@ namespace PassagensAreas.Controllers
 
             return Ok("Reserva realizada com sucesso.");
         }
+
         // GET: api/VooClientes
         [HttpGet]
         public async Task<ActionResult<IEnumerable<VooCliente>>> GetVooSet()
@@ -141,7 +151,7 @@ namespace PassagensAreas.Controllers
             }
 
             // Verifica se o check-in está dentro do período permitido
-            var voo = await _context.VooSet.FindAsync(reserva.Id_voo);
+            var voo = await _context.VooSet.FindAsync(reserva.Id_Voo);
             if (voo == null)
             {
                 return NotFound("Voo não encontrado.");
@@ -169,7 +179,7 @@ namespace PassagensAreas.Controllers
             // Cria o registro de check-in
             var checkIn = new CheckIn
             {
-                IdReserva = idReserva,
+                Id_ReservaDePassagem = idReserva,
                 DataCheckIn = (DateTime.Now),
                 AssentoEscolhido = assentoEscolhido,
                 CheckInRealizado = true
@@ -214,7 +224,7 @@ namespace PassagensAreas.Controllers
             }
 
             // Verifica se o check-in foi realizado
-            var checkIn = await _contextCheckIn.CheckInSet.FirstOrDefaultAsync(c => c.IdReserva == idReserva);
+            var checkIn = await _contextCheckIn.CheckInSet.FirstOrDefaultAsync(c => c.Id_ReservaDePassagem == idReserva);
             if (checkIn == null || !checkIn.CheckInRealizado)
             {
                 return BadRequest("Check-in não realizado. O bilhete só pode ser emitido após o check-in.");
@@ -222,7 +232,7 @@ namespace PassagensAreas.Controllers
 
             // Busca as informações do cliente e voo
             var cliente = await _contextCliente.ClienteSet.FindAsync(reserva.CPFCliente);
-            var voo = await _context.VooSet.FindAsync(reserva.Id_voo);
+            var voo = await _context.VooSet.FindAsync(reserva.Id_Voo);
 
             if (cliente == null || voo == null)
             {
@@ -283,7 +293,7 @@ namespace PassagensAreas.Controllers
             }
 
             // Busca o voo relacionado à reserva
-            var voo = await _context.VooSet.FindAsync(reserva.Id_voo);
+            var voo = await _context.VooSet.FindAsync(reserva.Id_Voo);
 
             if (voo == null)
             {

@@ -16,7 +16,6 @@ builder.Services.AddDbContext<ClienteContext>();
 builder.Services.AddDbContext<VooContext>();
 builder.Services.AddDbContext<BilheteContext>();
 builder.Services.AddDbContext<ReservaDePassagemContext>();
-builder.Services.AddDbContext<AssentoContext>();
 builder.Services.AddDbContext<VendaContext>();
 builder.Services.AddDbContext<CheckInContext>();
 

@@ -25,29 +25,20 @@ namespace PassagensAreas.Controllers
             _contextVenda = contextVenda;
         }
 
-
-        [HttpGet("vendas-mensal")]
-        public async Task<ActionResult<IEnumerable<RelatorioVendas>>> GerarRelatorioVendasMensal()
+        [HttpGet("relatorio-vendas")]
+        public async Task<ActionResult<IEnumerable<RelatorioVendas>>> GerarRelatorioVendas()
         {
-            var mesAtual = DateTime.Now.Month;
-            var anoAtual = DateTime.Now.Year;
-
-            var vendasMesAtual = await _contextVenda.VendaSet
-                .Where(v => v.DataVenda.Month == mesAtual && v.DataVenda.Year == anoAtual)
+            var vendas = await _contextVenda.VendaSet
+                .GroupBy(v => new { v.NumeroVoo, v.FormaPagamento })
+                .Select(g => new RelatorioVendas
+                {
+                    NumeroVoo = g.Key.NumeroVoo,
+                    FormaPagamento = g.Key.FormaPagamento,
+                    ValorTotal = g.Sum(v => v.ValorTotal)
+                })
                 .ToListAsync();
 
-            var vendasMesAnterior = await _contextVenda.VendaSet
-                .Where(v => v.DataVenda.Month == mesAtual - 1 && v.DataVenda.Year == anoAtual)
-                .ToListAsync();
-
-            if (vendasMesAtual.Count == 0)
-            {
-                return NotFound("Nenhuma venda encontrada no mês atual.");
-            }
-
-            var relatorios = new List<RelatorioVendas>();
-
-            return Ok(relatorios);
+            return Ok(vendas);
         }
 
         // Endpoint para gerar relatório semanal de ocupação dos voos
@@ -60,7 +51,7 @@ namespace PassagensAreas.Controllers
             var voos = await _context.VooSet.ToListAsync();
             var reservas = await _contextReserva.ReservaDePassagemSet
                 .Where(r => r.DataReserva >= inicioDaSemana && r.DataReserva < fimDaSemana)
-                .GroupBy(r => r.Id_voo)
+                .GroupBy(r => r.Id_Voo)
                 .Select(g => new
                 {
                     VooId = g.Key,

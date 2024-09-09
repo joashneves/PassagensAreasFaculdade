@@ -21,7 +21,7 @@ namespace Infraestrutura
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
             var connectionString = _configuration.GetConnectionString("MySQLData");
-            optionsBuilder.UseMySql(connectionString, ServerVersion.AutoDetect(connectionString));
+            optionsBuilder.UseMySQL(connectionString);
         }
         public void InitializeData()
         {

@@ -50,7 +50,38 @@ namespace PassagensAreas.Controllers
             return Ok(relatorios);
         }
 
+        // Endpoint para gerar relatório semanal de ocupação dos voos
+        [HttpGet("ocupacao-semanal")]
+        public async Task<ActionResult<IEnumerable<RelatorioOcupacao>>> GerarRelatorioOcupacaoSemanal()
+        {
+            var inicioDaSemana = DateTime.Now.AddDays(-(int)DateTime.Now.DayOfWeek + (int)DayOfWeek.Monday);
+            var fimDaSemana = inicioDaSemana.AddDays(7);
 
+            var voos = await _context.VooSet.ToListAsync();
+            var reservas = await _contextReserva.ReservaDePassagemSet
+                .Where(r => r.DataReserva >= inicioDaSemana && r.DataReserva < fimDaSemana)
+                .GroupBy(r => r.Id_voo)
+                .Select(g => new
+                {
+                    VooId = g.Key,
+                    TotalReservado = g.Sum(r => r.AssentosReservados)
+                })
+                .ToListAsync();
+
+            var relatorios = voos.Select(v => new RelatorioOcupacao
+            {
+                VooId = v.Id,
+                DataRelatorio = DateTime.Now,
+                PercentualOcupacao = reservas.FirstOrDefault(r => r.VooId == v.Id)?.TotalReservado / (double)v.QuantidadeMaximaPassageiros * 100 ?? 0
+            }).ToList();
+
+            if (relatorios.Count == 0)
+            {
+                return NotFound("Nenhuma ocupação encontrada para a semana atual.");
+            }
+
+            return Ok(relatorios);
+        }
 
     }
 }

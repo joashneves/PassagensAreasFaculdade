@@ -2,12 +2,9 @@
 {
     public class RelatorioOcupacao
     {
-        public int NumeroVoo { get; set; }
-        public string Origem { get; set; }
-        public string Destino { get; set; }
-        public int TotalAssentos { get; set; }
-        public int AssentosOcupados { get; set; }
-        public float PercentualOcupacao { get; set; }
-        public DateTime DataVoo { get; set; }
+        public int Id { get; set; }
+        public int VooId { get; set; }
+        public DateTime DataRelatorio { get; set; }
+        public double PercentualOcupacao { get; set; }
     }
 }

@@ -171,7 +171,17 @@ namespace PassagensAreas.Controllers
             // Adiciona o check-in ao banco de dados
             _contextCheckIn.CheckInSet.Add(checkIn);
 
+            // Registra mudança de ocupação
+            var ocupacao = new RelatorioOcupacao
+            {
+                VooId = voo.Id,
+                DataRelatorio = DateTime.Now,
+                PercentualOcupacao = (double)voo.QuantidadePassageiros / voo.QuantidadeMaximaPassageiros * 100
+            };
+            _contextReserva.Add(ocupacao);
+
             // Salva as mudanças
+            await _contextReserva.SaveChangesAsync();
             await _context.SaveChangesAsync();
             await _contextCheckIn.SaveChangesAsync();
 
@@ -282,7 +292,17 @@ namespace PassagensAreas.Controllers
             // Atualiza o voo no banco de dados
             _context.Entry(voo).State = EntityState.Modified;
 
+            // Registra mudança de ocupação
+            var ocupacao = new RelatorioOcupacao
+            {
+                VooId = voo.Id,
+                DataRelatorio = DateTime.Now,
+                PercentualOcupacao = (double)voo.QuantidadePassageiros / voo.QuantidadeMaximaPassageiros * 100
+            };
+            _contextReserva.Add(ocupacao);
+
             // Salva as mudanças
+            await _contextReserva.SaveChangesAsync();
             await _context.SaveChangesAsync();
             await _contextReserva.SaveChangesAsync();
 

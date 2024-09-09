@@ -12,20 +12,13 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
-builder.Services.AddDbContext<ClienteContext>(opt =>
-    opt.UseInMemoryDatabase("ClienteList"));
-builder.Services.AddDbContext<VooContext>(opt =>
-    opt.UseInMemoryDatabase("VooList"));
-builder.Services.AddDbContext<BilheteContext>(opt =>
-    opt.UseInMemoryDatabase("BilheteList"));
-builder.Services.AddDbContext<ReservaDePassagemContext>(opt =>
-    opt.UseInMemoryDatabase("ReservaDePassagemList"));
-builder.Services.AddDbContext<AssentoContext>(opt =>
-    opt.UseInMemoryDatabase("AssentoList"));
-builder.Services.AddDbContext<VendaContext>(opt =>
-    opt.UseInMemoryDatabase("VendaList"));
-builder.Services.AddDbContext<CheckInContext>(opt =>
-    opt.UseInMemoryDatabase("ChekinList"));
+builder.Services.AddDbContext<ClienteContext>();
+builder.Services.AddDbContext<VooContext>();
+builder.Services.AddDbContext<BilheteContext>();
+builder.Services.AddDbContext<ReservaDePassagemContext>();
+builder.Services.AddDbContext<AssentoContext>();
+builder.Services.AddDbContext<VendaContext>();
+builder.Services.AddDbContext<CheckInContext>();
 
 var app = builder.Build();
 

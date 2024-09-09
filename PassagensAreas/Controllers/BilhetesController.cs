@@ -41,10 +41,5 @@ namespace PassagensAreas.Controllers
 
             return bilhete;
         }
-
-        private bool BilheteExists(int id)
-        {
-            return _context.BilheteSet.Any(e => e.Id == id);
-        }
     }
 }

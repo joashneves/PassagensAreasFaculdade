@@ -89,19 +89,19 @@ namespace PassagensAreas.Controllers
             voo.QuantidadePassageiros += quantidadePassageiros;
 
             // Define o valor fixo por passagem (exemplo: R$100,00)
-            decimal valorPorPassagem = 100.00m; // Valor fixo em reais
+            decimal valorPorPassagem = 100.00m;
             decimal totalArrecadado = valorPorPassagem * quantidadePassageiros;
 
             // Cria a reserva de passagem
             var novaReserva = new ReservaDePassagem
             {
                 Id_Voo = voo.Id,
-                CPFCliente = reserva.CPFCliente,  // Assume-se que o CPF foi passado no body
+                CPFCliente = reserva.CPFCliente,  
                 DataReserva = DateTime.Now,
                 NumeroVoo = voo.NumeroVoo,
                 AssentosReservados = quantidadePassageiros,
-                FormaPagamento = formaPagamento,  // Adiciona a forma de pagamento
-                ValorTotal = totalArrecadado // Adiciona o valor total da reserva
+                FormaPagamento = formaPagamento,
+                ValorTotal = totalArrecadado
             };
             Console.WriteLine(novaReserva.ToString());
 
@@ -208,7 +208,6 @@ namespace PassagensAreas.Controllers
         // Função auxiliar para verificar se o assento está disponível
         private bool AssentoDisponivel(VooCliente voo, string assentoEscolhido)
         {
-            
             return true;
         }
 
@@ -262,9 +261,6 @@ namespace PassagensAreas.Controllers
         // Função auxiliar para enviar o bilhete por e-mail
         private async Task EnviarBilhetePorEmail(string email, Bilhete bilhete)
         {
-            // Aqui você implementaria o envio real de e-mail.
-            // Pode usar serviços como SendGrid, Amazon SES, ou SMTP.
-            // Exemplo simplificado:
             var mensagem = $@"
         Bilhete Eletrônico
         -----------------
@@ -324,11 +320,6 @@ namespace PassagensAreas.Controllers
             await _contextReserva.SaveChangesAsync();
 
             return Ok("Reserva cancelada com sucesso.");
-        }
-
-        private bool VooClienteExists(int id)
-        {
-            return _context.VooSet.Any(e => e.Id == id);
         }
     }
 }

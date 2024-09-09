@@ -48,6 +48,7 @@ namespace PassagensAreas.Controllers
             var inicioDaSemana = DateTime.Now.AddDays(-(int)DateTime.Now.DayOfWeek + (int)DayOfWeek.Monday);
             var fimDaSemana = inicioDaSemana.AddDays(7);
 
+            // Obtém todas as reservas na semana atual e agrupa por voo
             var voos = await _context.VooSet.ToListAsync();
             var reservas = await _contextReserva.ReservaDePassagemSet
                 .Where(r => r.DataReserva >= inicioDaSemana && r.DataReserva < fimDaSemana)
@@ -58,7 +59,7 @@ namespace PassagensAreas.Controllers
                     TotalReservado = g.Sum(r => r.AssentosReservados)
                 })
                 .ToListAsync();
-
+            // Cria o relatório de ocupação com base nas reservas e na quantidade máxima de passageiros
             var relatorios = voos.Select(v => new RelatorioOcupacao
             {
                 VooId = v.Id,

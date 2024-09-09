@@ -5,8 +5,8 @@ namespace PassagensAreas.Domain.Models
 {
     public class VooCliente
     {
-        [Key] // Define o campo como chave primária
-        [DatabaseGenerated(DatabaseGeneratedOption.Identity)] // Gera o valor automaticamente
+        [Key] 
+        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int Id { get; set; }
         public string Origem { get; set; }
         public string Destino { get; set; }

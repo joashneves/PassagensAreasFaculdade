@@ -20,8 +20,8 @@ namespace Infraestrutura
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
-
-            optionsBuilder.UseInMemoryDatabase("ClienteDataInMemory");
+            var connectionString = _configuration.GetConnectionString("MySQLData");
+            optionsBuilder.UseMySql(connectionString, ServerVersion.AutoDetect(connectionString));
         }
         public void InitializeData()
         {

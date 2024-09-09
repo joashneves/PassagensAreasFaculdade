@@ -67,7 +67,14 @@ namespace PassagensAreas.Controllers
             {
                 return NotFound("Voo não encontrado.");
             }
+            // Verifica se o CPF informado já existe no banco de dados
+            var clienteExistente = await _contextCliente.ClienteSet
+                .FirstOrDefaultAsync(c => c.CPF == reserva.CPFCliente);
 
+            if (clienteExistente == null)
+            {
+                return NotFound("CPF não encontrado. Por favor, registre-se antes de realizar a reserva.");
+            }
             // Verifica se há assentos disponíveis
             int assentosDisponiveis = voo.QuantidadeMaximaPassageiros - voo.QuantidadePassageiros;
             if (assentosDisponiveis < quantidadePassageiros)

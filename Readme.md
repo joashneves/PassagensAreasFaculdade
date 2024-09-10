@@ -12,26 +12,36 @@ Desenvolvido por [Joas](https://github.com/joashneves)
 #### Retorna todos os itens
 
 ```http
-  GET /api/items
+  GET /api/VooClientes
+```
+
+Resposta: Lista de todos os voos disponíveis.
+
+## Retorna um voo específico
+
+```http
+  GET /api/VooClientes/{id}
 ```
 
 | Parâmetro   | Tipo       | Descrição                           |
 | :---------- | :--------- | :---------------------------------- |
-| `api_key` | `string` | **Obrigatório**. A chave da sua API |
+| `di` | `int` | **Obrigatório**. O ID do voo que você deseja consultar. |
 
-#### Retorna um item
+####  Consulta voos com base em parâmetros
 
 ```http
-  GET /api/items/${id}
+  GET /api/VooClientes/consulta
 ```
 
 | Parâmetro   | Tipo       | Descrição                                   |
 | :---------- | :--------- | :------------------------------------------ |
-| `id`      | `string` | **Obrigatório**. O ID do item que você quer |
+| `origem`      | `string` | **Obrigatório**.  A cidade de origem do voo. |
+| `origem`      | `string` | **Obrigatório**. A cidade de destino do voo.|
+| `origem`      | `DateTime` | Opcional. Data de ida do voo. |
+| `origem`      | `DateTime` | Opcional. Data de volta do voo. |
 
-#### add(num1, num2)
+Resposta: Lista de voos que atendem aos critérios fornecidos.
 
-Recebe dois números e retorna a sua soma.
 
 
 ## Rodando localmente

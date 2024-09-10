@@ -7,42 +7,6 @@ Uma Api para sistemas de reservas de passagens Aéreas, ele é uma API de um tra
 
 Desenvolvido por [Joas](https://github.com/joashneves)
 
-## Documentação da API
-
-#### Retorna todos os itens
-
-```http
-  GET /api/VooClientes
-```
-
-Resposta: Lista de todos os voos disponíveis.
-
-## Retorna um voo específico
-
-```http
-  GET /api/VooClientes/{id}
-```
-
-| Parâmetro   | Tipo       | Descrição                           |
-| :---------- | :--------- | :---------------------------------- |
-| `di` | `int` | **Obrigatório**. O ID do voo que você deseja consultar. |
-
-####  Consulta voos com base em parâmetros
-
-```http
-  GET /api/VooClientes/consulta
-```
-
-| Parâmetro   | Tipo       | Descrição                                   |
-| :---------- | :--------- | :------------------------------------------ |
-| `origem`      | `string` | **Obrigatório**.  A cidade de origem do voo. |
-| `origem`      | `string` | **Obrigatório**. A cidade de destino do voo.|
-| `origem`      | `DateTime` | Opcional. Data de ida do voo. |
-| `origem`      | `DateTime` | Opcional. Data de volta do voo. |
-
-Resposta: Lista de voos que atendem aos critérios fornecidos.
-
-
 
 ## Rodando localmente
 

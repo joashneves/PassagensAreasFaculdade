@@ -34,25 +34,31 @@ namespace PassagensAreas.Controllers
             [FromQuery] DateTime? ida,
             [FromQuery] DateTime? volta)
         {
-            // Valida se origem e destino foram informados
-            if (string.IsNullOrEmpty(origem) || string.IsNullOrEmpty(destino))
+            try
             {
-                return BadRequest("Origem e destino são obrigatórios.");
-            }
+                // Valida se origem e destino foram informados
+                if (string.IsNullOrEmpty(origem) || string.IsNullOrEmpty(destino))
+                {
+                    return BadRequest("Origem e destino são obrigatórios.");
+                }
 
-            // Consulta os voos disponíveis com base nos parâmetros
-            var voos = await _context.VooSet
-                .Where(v => v.Origem == origem && v.Destino == destino)
-                .Where(v => ida == null || v.Ida == ida)    // Se a data de ida for informada, filtra pela data
-                .Where(v => volta == null || v.Volta == volta)  // Se a data de volta for informada, filtra pela data
-                .ToListAsync();
+                // Consulta os voos disponíveis com base nos parâmetros
+                var voos = await _context.VooSet
+                    .Where(v => v.Origem == origem && v.Destino == destino)
+                    .Where(v => ida == null || v.Ida == ida)
+                    .Where(v => volta == null || v.Volta == volta)
+                    .ToListAsync();
 
-            if (!voos.Any())
+                if (!voos.Any())
+                {
+                    return NotFound("Nenhum voo encontrado para os critérios informados.");
+                }
+
+                return Ok(voos);
+            } catch (Exception ex)
             {
-                return NotFound("Nenhum voo encontrado para os critérios informados.");
+                return BadRequest("Ocorreu um erro");
             }
-
-            return Ok(voos);
         }
 
         [HttpPost("reservar")]
@@ -61,61 +67,67 @@ namespace PassagensAreas.Controllers
     [FromQuery] int quantidadePassageiros,
     [FromQuery] string formaPagamento) // Adiciona o parâmetro formaPagamento
         {
-            // Verifica se o voo existe
-            var voo = await _context.VooSet.FirstOrDefaultAsync(v => v.Id == reserva.Id_Voo);
-
-            if (voo == null)
+            try
             {
-                return NotFound("Voo não encontrado.");
+                // Verifica se o voo existe
+                var voo = await _context.VooSet.FirstOrDefaultAsync(v => v.Id == reserva.Id_Voo);
+
+                if (voo == null)
+                {
+                    return NotFound("Voo não encontrado.");
+                }
+
+                // Verifica se o CPF informado já existe no banco de dados
+                var clienteExistente = await _contextCliente.ClienteSet
+                    .FirstOrDefaultAsync(c => c.CPF == reserva.CPFCliente);
+
+                if (clienteExistente == null)
+                {
+                    return NotFound("CPF não encontrado. Por favor, registre-se antes de realizar a reserva.");
+                }
+
+                // Verifica se há assentos disponíveis
+                int assentosDisponiveis = voo.QuantidadeMaximaPassageiros - voo.QuantidadePassageiros;
+                if (assentosDisponiveis < quantidadePassageiros)
+                {
+                    return BadRequest("Não há assentos disponíveis para a quantidade de passageiros informada.");
+                }
+
+                // Atualiza a quantidade de passageiros no voo
+                voo.QuantidadePassageiros += quantidadePassageiros;
+
+                // Define o valor fixo por passagem (exemplo: R$100,00)
+                decimal valorPorPassagem = 100.00m;
+                decimal totalArrecadado = valorPorPassagem * quantidadePassageiros;
+
+                // Cria a reserva de passagem
+                var novaReserva = new ReservaDePassagem
+                {
+                    Id_Voo = voo.Id,
+                    CPFCliente = reserva.CPFCliente,
+                    DataReserva = DateTime.Now,
+                    NumeroVoo = voo.NumeroVoo,
+                    AssentosReservados = quantidadePassageiros,
+                    FormaPagamento = formaPagamento,
+                    ValorTotal = totalArrecadado
+                };
+                Console.WriteLine(novaReserva.ToString());
+
+                // Adiciona a reserva ao banco de dados
+                _contextReserva.ReservaDePassagemSet.Add(novaReserva);
+
+                // Atualiza o voo com a nova quantidade de passageiros
+                _context.Entry(voo).State = EntityState.Modified;
+
+                // Salva as mudanças
+                await _context.SaveChangesAsync();
+                await _contextReserva.SaveChangesAsync();
+
+                return Ok("Reserva realizada com sucesso.");
+            } catch (Exception ex)
+            {
+                return BadRequest("Ocorreu um erro:"+ex.ToString());
             }
-
-            // Verifica se o CPF informado já existe no banco de dados
-            var clienteExistente = await _contextCliente.ClienteSet
-                .FirstOrDefaultAsync(c => c.CPF == reserva.CPFCliente);
-
-            if (clienteExistente == null)
-            {
-                return NotFound("CPF não encontrado. Por favor, registre-se antes de realizar a reserva.");
-            }
-
-            // Verifica se há assentos disponíveis
-            int assentosDisponiveis = voo.QuantidadeMaximaPassageiros - voo.QuantidadePassageiros;
-            if (assentosDisponiveis < quantidadePassageiros)
-            {
-                return BadRequest("Não há assentos disponíveis para a quantidade de passageiros informada.");
-            }
-
-            // Atualiza a quantidade de passageiros no voo
-            voo.QuantidadePassageiros += quantidadePassageiros;
-
-            // Define o valor fixo por passagem (exemplo: R$100,00)
-            decimal valorPorPassagem = 100.00m;
-            decimal totalArrecadado = valorPorPassagem * quantidadePassageiros;
-
-            // Cria a reserva de passagem
-            var novaReserva = new ReservaDePassagem
-            {
-                Id_Voo = voo.Id,
-                CPFCliente = reserva.CPFCliente,  
-                DataReserva = DateTime.Now,
-                NumeroVoo = voo.NumeroVoo,
-                AssentosReservados = quantidadePassageiros,
-                FormaPagamento = formaPagamento,
-                ValorTotal = totalArrecadado
-            };
-            Console.WriteLine(novaReserva.ToString());
-
-            // Adiciona a reserva ao banco de dados
-            _contextReserva.ReservaDePassagemSet.Add(novaReserva);
-
-            // Atualiza o voo com a nova quantidade de passageiros
-            _context.Entry(voo).State = EntityState.Modified;
-
-            // Salva as mudanças
-            await _context.SaveChangesAsync();
-            await _contextReserva.SaveChangesAsync();
-
-            return Ok("Reserva realizada com sucesso.");
         }
 
         // GET: api/VooClientes

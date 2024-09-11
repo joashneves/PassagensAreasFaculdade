@@ -18,6 +18,7 @@ builder.Services.AddDbContext<BilheteContext>();
 builder.Services.AddDbContext<ReservaDePassagemContext>();
 builder.Services.AddDbContext<VendaContext>();
 builder.Services.AddDbContext<CheckInContext>();
+builder.Services.AddDbContext<RelatorioOcupacaoContext>();
 
 var app = builder.Build();
 

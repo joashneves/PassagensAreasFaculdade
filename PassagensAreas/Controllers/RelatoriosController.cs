@@ -1,6 +1,7 @@
 ﻿using Infraestrutura;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using PassagensAreas.Domain.DTOs;
 using PassagensAreas.Domain.Models;
 using PassagensAreas.Infraestrutura;
 using System;
@@ -17,20 +18,22 @@ namespace PassagensAreas.Controllers
         private readonly VooContext _context;
         private readonly ReservaDePassagemContext _contextReserva;
         private readonly VendaContext _contextVenda;
+        private readonly RelatorioOcupacaoContext _contextOcupacao;
 
-        public RelatoriosController(VooContext context, ReservaDePassagemContext contextReserva, VendaContext contextVenda)
+        public RelatoriosController(VooContext context, ReservaDePassagemContext contextReserva, VendaContext contextVenda, RelatorioOcupacaoContext contextOcupacao)
         {
             _context = context;
             _contextReserva = contextReserva;
             _contextVenda = contextVenda;
+            _contextOcupacao = contextOcupacao;
         }
 
         [HttpGet("relatorio-vendas")]
-        public async Task<ActionResult<IEnumerable<RelatorioVendas>>> GerarRelatorioVendas()
+        public async Task<ActionResult<IEnumerable<RelatorioVendasDTO>>> GerarRelatorioVendas()
         {
             var vendas = await _contextVenda.VendaSet
                 .GroupBy(v => new { v.NumeroVoo, v.FormaPagamento })
-                .Select(g => new RelatorioVendas
+                .Select(g => new RelatorioVendasDTO
                 {
                     NumeroVoo = g.Key.NumeroVoo,
                     FormaPagamento = g.Key.FormaPagamento,
@@ -43,7 +46,7 @@ namespace PassagensAreas.Controllers
 
         // Endpoint para gerar relatório semanal de ocupação dos voos
         [HttpGet("ocupacao-semanal")]
-        public async Task<ActionResult<IEnumerable<RelatorioOcupacao>>> GerarRelatorioOcupacaoSemanal()
+        public async Task<ActionResult<IEnumerable<RelatorioOcupacaoDTO>>> GerarRelatorioOcupacaoSemanal()
         {
             var inicioDaSemana = DateTime.Now.AddDays(-(int)DateTime.Now.DayOfWeek + (int)DayOfWeek.Monday);
             var fimDaSemana = inicioDaSemana.AddDays(7);
@@ -59,10 +62,10 @@ namespace PassagensAreas.Controllers
                     TotalReservado = g.Sum(r => r.AssentosReservados)
                 })
                 .ToListAsync();
+
             // Cria o relatório de ocupação com base nas reservas e na quantidade máxima de passageiros
-            var relatorios = voos.Select(v => new RelatorioOcupacao
+            var relatorios = voos.Select(v => new RelatorioOcupacaoDTO
             {
-                VooId = v.Id,
                 DataRelatorio = DateTime.Now,
                 PercentualOcupacao = reservas.FirstOrDefault(r => r.VooId == v.Id)?.TotalReservado / (double)v.QuantidadeMaximaPassageiros * 100 ?? 0
             }).ToList();
@@ -74,6 +77,7 @@ namespace PassagensAreas.Controllers
 
             return Ok(relatorios);
         }
+
 
     }
 }

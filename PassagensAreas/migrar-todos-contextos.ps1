@@ -4,7 +4,8 @@ $contexts = @(
     "BilheteContext",
     "ReservaDePassagemContext",
     "VendaContext",
-    "CheckInContext"
+    "CheckInContext",
+    "RelatorioOcupacaoContext"
 )
 
 foreach ($context in $contexts) {

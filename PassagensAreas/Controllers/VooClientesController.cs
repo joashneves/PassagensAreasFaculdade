@@ -8,6 +8,7 @@ using Microsoft.EntityFrameworkCore;
 using Infraestrutura;
 using PassagensAreas.Domain.Models;
 using PassagensAreas.Infraestrutura;
+using PassagensAreas.Domain.DTOs;
 
 namespace PassagensAreas.Controllers
 {
@@ -19,16 +20,18 @@ namespace PassagensAreas.Controllers
         private readonly ReservaDePassagemContext _contextReserva;
         private readonly CheckInContext _contextCheckIn;
         private readonly ClienteContext _contextCliente;
+        private readonly RelatorioOcupacaoContext _contextOcupacao;
 
-        public VooClientesController(VooContext context, ReservaDePassagemContext contextReserva, CheckInContext contextChekin, ClienteContext contextCliente)
+        public VooClientesController(VooContext context, ReservaDePassagemContext contextReserva, CheckInContext contextChekin, ClienteContext contextCliente, RelatorioOcupacaoContext contextOcupacao)
         {
             _context = context ?? throw new ArgumentNullException(nameof(context));
             _contextReserva = contextReserva ?? throw new ArgumentNullException(nameof(contextReserva));
             _contextCheckIn = contextChekin ?? throw new ArgumentNullException(nameof(contextChekin));
             _contextCliente = contextCliente ?? throw new ArgumentNullException(nameof(contextCliente));
+            _contextOcupacao = contextOcupacao ?? throw new ArgumentNullException(nameof(contextOcupacao));
         }
         [HttpGet("consulta")]
-        public async Task<ActionResult<IEnumerable<VooCliente>>> ConsultarVoos(
+        public async Task<ActionResult<IEnumerable<VooClienteDTO>>> ConsultarVoos(
             [FromQuery] string origem,
             [FromQuery] string destino,
             [FromQuery] DateTime? ida,
@@ -54,23 +57,39 @@ namespace PassagensAreas.Controllers
                     return NotFound("Nenhum voo encontrado para os critérios informados.");
                 }
 
-                return Ok(voos);
-            } catch (Exception ex)
+                // Mapeia os dados de Voo para VooClienteDTO
+                var voosDTO = voos.Select(v => new VooClienteDTO
+                {
+                    Origem = v.Origem,
+                    Destino = v.Destino,
+                    Ida = v.Ida,
+                    Volta = v.Volta,
+                    Preco = v.Preco,
+                    Companhias = v.Companhias,
+                    QuantidadeMaximaPassageiros = v.QuantidadeMaximaPassageiros,
+                    QuantidadePassageiros = v.QuantidadePassageiros,
+                    NumeroVoo = v.NumeroVoo
+                }).ToList();
+
+                return Ok(voosDTO);
+            }
+            catch (Exception ex)
             {
                 return BadRequest("Ocorreu um erro");
             }
         }
 
+
         [HttpPost("reservar")]
         public async Task<IActionResult> ReservarPassagem(
-    [FromBody] ReservaDePassagem reserva,
+    [FromBody] ReservaDePassagemDTO reservaDTO,
     [FromQuery] int quantidadePassageiros,
-    [FromQuery] string formaPagamento) // Adiciona o parâmetro formaPagamento
+    [FromQuery] string formaPagamento)
         {
             try
             {
-                // Verifica se o voo existe
-                var voo = await _context.VooSet.FirstOrDefaultAsync(v => v.Id == reserva.Id_Voo);
+                // Verifica se o voo existe pelo número do voo
+                var voo = await _context.VooSet.FirstOrDefaultAsync(v => v.NumeroVoo == reservaDTO.NumeroVoo);
 
                 if (voo == null)
                 {
@@ -79,7 +98,7 @@ namespace PassagensAreas.Controllers
 
                 // Verifica se o CPF informado já existe no banco de dados
                 var clienteExistente = await _contextCliente.ClienteSet
-                    .FirstOrDefaultAsync(c => c.CPF == reserva.CPFCliente);
+                    .FirstOrDefaultAsync(c => c.CPF == reservaDTO.CPFCliente);
 
                 if (clienteExistente == null)
                 {
@@ -100,18 +119,16 @@ namespace PassagensAreas.Controllers
                 decimal valorPorPassagem = 100.00m;
                 decimal totalArrecadado = valorPorPassagem * quantidadePassageiros;
 
-                // Cria a reserva de passagem
                 var novaReserva = new ReservaDePassagem
                 {
                     Id_Voo = voo.Id,
-                    CPFCliente = reserva.CPFCliente,
+                    CPFCliente = reservaDTO.CPFCliente,
                     DataReserva = DateTime.Now,
-                    NumeroVoo = voo.NumeroVoo,
+                    NumeroVoo = reservaDTO.NumeroVoo,
                     AssentosReservados = quantidadePassageiros,
                     FormaPagamento = formaPagamento,
                     ValorTotal = totalArrecadado
                 };
-                Console.WriteLine(novaReserva.ToString());
 
                 // Adiciona a reserva ao banco de dados
                 _contextReserva.ReservaDePassagemSet.Add(novaReserva);
@@ -123,99 +140,138 @@ namespace PassagensAreas.Controllers
                 await _context.SaveChangesAsync();
                 await _contextReserva.SaveChangesAsync();
 
-                return Ok("Reserva realizada com sucesso.");
-            } catch (Exception ex)
+                // Retorna o DTO da reserva criada
+                var reservaCriada = new ReservaDePassagemDTO
+                {
+                    CPFCliente = novaReserva.CPFCliente,
+                    DataReserva = novaReserva.DataReserva,
+                    NumeroVoo = novaReserva.NumeroVoo
+                };
+
+                return Ok(new { mensagem = "Reserva realizada com sucesso.", reserva = reservaCriada });
+            }
+            catch (Exception ex)
             {
-                return BadRequest("Ocorreu um erro:"+ex.ToString());
+                return BadRequest($"Ocorreu um erro: {ex.Message}");
             }
         }
-
-        // GET: api/VooClientes
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<VooCliente>>> GetVooSet()
+        public async Task<ActionResult<IEnumerable<VooClienteDTO>>> GetVooSet()
         {
-            return await _context.VooSet.ToListAsync();
+            var voos = await _context.VooSet
+                .Select(v => new VooClienteDTO
+                {
+                    Origem = v.Origem,
+                    Destino = v.Destino,
+                    Ida = v.Ida,
+                    Volta = v.Volta,
+                    Preco = v.Preco,
+                    Companhias = v.Companhias,
+                    QuantidadeMaximaPassageiros = v.QuantidadeMaximaPassageiros,
+                    QuantidadePassageiros = v.QuantidadePassageiros,
+                    NumeroVoo = v.NumeroVoo
+                })
+                .ToListAsync();
+
+            return Ok(voos);
         }
-
-        // GET: api/VooClientes/5
         [HttpGet("{id}")]
-        public async Task<ActionResult<VooCliente>> GetVooCliente(int id)
+        public async Task<ActionResult<VooClienteDTO>> GetVooCliente(int id)
         {
-            var vooCliente = await _context.VooSet.FindAsync(id);
+            var voo = await _context.VooSet
+                .Where(v => v.Id == id)
+                .Select(v => new VooClienteDTO
+                {
+                    Origem = v.Origem,
+                    Destino = v.Destino,
+                    Ida = v.Ida,
+                    Volta = v.Volta,
+                    Preco = v.Preco,
+                    Companhias = v.Companhias,
+                    QuantidadeMaximaPassageiros = v.QuantidadeMaximaPassageiros,
+                    QuantidadePassageiros = v.QuantidadePassageiros,
+                    NumeroVoo = v.NumeroVoo
+                })
+                .FirstOrDefaultAsync();
 
-            if (vooCliente == null)
+            if (voo == null)
             {
                 return NotFound();
             }
 
-            return vooCliente;
+            return Ok(voo);
         }
-
-        [HttpPost("checkin/{idReserva}")]
-        public async Task<IActionResult> FazerCheckIn(int idReserva, [FromBody] string assentoEscolhido)
+        [HttpPost("checkin/{numeroVoo}")]
+        public async Task<IActionResult> FazerCheckIn(int numeroVoo, [FromBody] CheckInDTO checkInDTO)
         {
-            // Busca a reserva
-            var reserva = await _contextReserva.ReservaDePassagemSet.FindAsync(idReserva);
-
-            if (reserva == null)
+            try
             {
-                return NotFound("Reserva não encontrada.");
+                // Busca a reserva usando o numeroVoo
+                var reserva = await _contextReserva.ReservaDePassagemSet
+                    .FirstOrDefaultAsync(r => r.NumeroVoo == numeroVoo);
+
+                if (reserva == null)
+                {
+                    return NotFound("Reserva não encontrada.");
+                }
+
+                // Verifica se o check-in está dentro do período permitido
+                var voo = await _context.VooSet.FindAsync(reserva.Id_Voo);
+                if (voo == null)
+                {
+                    return NotFound("Voo não encontrado.");
+                }
+
+
+                // Confirmação dos dados cadastrais do cliente
+                    var cliente = await _contextCliente.ClienteSet
+                .FirstOrDefaultAsync(c => c.CPF == reserva.CPFCliente);
+                if (cliente == null)
+                {
+                    return NotFound("Cliente não encontrado.");
+                }
+
+                // Verifica a disponibilidade do assento
+                if (!AssentoDisponivel(voo, checkInDTO.AssentoEscolhido))
+                {
+                    return BadRequest("O assento escolhido não está disponível.");
+                }
+
+                // Cria o registro de check-in
+                var checkIn = new CheckIn
+                {
+                    Id_ReservaDePassagem = reserva.Id,
+                    DataCheckIn = DateTime.Now,
+                    AssentoEscolhido = checkInDTO.AssentoEscolhido,
+                    CheckInRealizado = true
+                };
+
+                // Adiciona o check-in ao banco de dados
+                _contextCheckIn.CheckInSet.Add(checkIn);
+
+                // Registra mudança de ocupação
+                var ocupacao = new RelatorioOcupacao
+                {
+                    VooId = voo.Id,
+                    DataRelatorio = DateTime.Now,
+                    PercentualOcupacao = (double)voo.QuantidadePassageiros / voo.QuantidadeMaximaPassageiros * 100
+                };
+                _contextOcupacao.Add(ocupacao);
+
+                // Salva as mudanças
+                await _contextReserva.SaveChangesAsync();
+                await _context.SaveChangesAsync();
+                await _contextCheckIn.SaveChangesAsync();
+
+                return Ok("Check-in realizado com sucesso.");
             }
-
-            // Verifica se o check-in está dentro do período permitido
-            var voo = await _context.VooSet.FindAsync(reserva.Id_Voo);
-            if (voo == null)
+            catch (Exception ex)
             {
-                return NotFound("Voo não encontrado.");
+                // Retorna o corpo da exceção em caso de erro
+                return StatusCode(500, new { mensagem = "Ocorreu um erro interno.", detalhes = ex.Message });
             }
-
-            var horasParaDecolagem = voo.Ida.Subtract(DateTime.Now).TotalHours;
-            if (horasParaDecolagem > 24 || horasParaDecolagem < 1)
-            {
-                return BadRequest("O check-in só pode ser realizado entre 24 horas e 1 hora antes da decolagem.");
-            }
-
-            // Confirmação dos dados cadastrais do cliente
-            var cliente = await _contextCliente.ClienteSet.FindAsync(reserva.CPFCliente);
-            if (cliente == null)
-            {
-                return NotFound("Cliente não encontrado.");
-            }
-
-            // Verifica a disponibilidade do assento
-            if (!AssentoDisponivel(voo, assentoEscolhido))
-            {
-                return BadRequest("O assento escolhido não está disponível.");
-            }
-
-            // Cria o registro de check-in
-            var checkIn = new CheckIn
-            {
-                Id_ReservaDePassagem = idReserva,
-                DataCheckIn = (DateTime.Now),
-                AssentoEscolhido = assentoEscolhido,
-                CheckInRealizado = true
-            };
-
-            // Adiciona o check-in ao banco de dados
-            _contextCheckIn.CheckInSet.Add(checkIn);
-
-            // Registra mudança de ocupação
-            var ocupacao = new RelatorioOcupacao
-            {
-                VooId = voo.Id,
-                DataRelatorio = DateTime.Now,
-                PercentualOcupacao = (double)voo.QuantidadePassageiros / voo.QuantidadeMaximaPassageiros * 100
-            };
-            _contextReserva.Add(ocupacao);
-
-            // Salva as mudanças
-            await _contextReserva.SaveChangesAsync();
-            await _context.SaveChangesAsync();
-            await _contextCheckIn.SaveChangesAsync();
-
-            return Ok("Check-in realizado com sucesso.");
         }
+
 
         // Função auxiliar para verificar se o assento está disponível
         private bool AssentoDisponivel(VooCliente voo, string assentoEscolhido)

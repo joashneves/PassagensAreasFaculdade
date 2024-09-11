@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Infraestrutura;
 using PassagensAreas.Domain.Models;
+using PassagensAreas.Domain.DTOs;
 
 namespace PassagensAreas.Controllers
 {
@@ -23,14 +24,25 @@ namespace PassagensAreas.Controllers
 
         // GET: api/Clientes
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Cliente>>> GetClienteSet()
+        public async Task<ActionResult<IEnumerable<ClienteDTO>>> GetClienteSet()
         {
-            return await _context.ClienteSet.ToListAsync();
-        }
+            var clientes = await _context.ClienteSet
+        .Select(cliente => new ClienteDTO
+        {
+            Nome = cliente.Nome,
+            CPF = cliente.CPF,
+            Endereco = cliente.Endereco,
+            Numero_telefone = cliente.Numero_telefone,
+            Numero_telefone_fixo = cliente.Numero_telefone_fixo,
+            Email = cliente.Email
+        })
+        .ToListAsync();
 
+            return Ok(clientes);
+        }
         // GET: api/Clientes/5
         [HttpGet("{id}")]
-        public async Task<ActionResult<Cliente>> GetCliente(long id)
+        public async Task<ActionResult<ClienteDTO>> GetCliente(int id)
         {
             var cliente = await _context.ClienteSet.FindAsync(id);
 
@@ -39,14 +51,24 @@ namespace PassagensAreas.Controllers
                 return NotFound();
             }
 
-            return cliente;
-        }
+            // Mapeando a entidade Cliente para o DTO
+            var clienteDTO = new ClienteDTO
+            {
+                Nome = cliente.Nome,
+                CPF = cliente.CPF,
+                Endereco = cliente.Endereco,
+                Numero_telefone = cliente.Numero_telefone,
+                Numero_telefone_fixo = cliente.Numero_telefone_fixo,
+                Email = cliente.Email
+            };
 
+            return Ok(clienteDTO);
+        }
         [HttpPut("{cpf}")]
-        public async Task<IActionResult> PutCliente(string cpf, Cliente cliente)
+        public async Task<IActionResult> PutCliente(string cpf, ClienteDTO clienteDTO)
         {
-            // Verifica se o cliente informado é o mesmo do CPF passado na URL
-            if (cpf != cliente.CPF)
+            // Verifica se o CPF informado é o mesmo do DTO
+            if (cpf != clienteDTO.CPF)
             {
                 return BadRequest("O CPF informado não corresponde ao cliente.");
             }
@@ -57,19 +79,29 @@ namespace PassagensAreas.Controllers
             // Se o cliente já existir, atualiza os dados
             if (clienteExistente != null)
             {
-                // Atualiza os dados do cliente existente
-                clienteExistente.Nome = cliente.Nome;
-                clienteExistente.Endereco = cliente.Endereco;
-                clienteExistente.Numero_telefone = cliente.Numero_telefone;
-                clienteExistente.Numero_telefone_fixo = cliente.Numero_telefone_fixo;
-                clienteExistente.Email = cliente.Email;
+                // Atualiza os dados do cliente existente com os dados do DTO
+                clienteExistente.Nome = clienteDTO.Nome;
+                clienteExistente.Endereco = clienteDTO.Endereco;
+                clienteExistente.Numero_telefone = clienteDTO.Numero_telefone;
+                clienteExistente.Numero_telefone_fixo = clienteDTO.Numero_telefone_fixo;
+                clienteExistente.Email = clienteDTO.Email;
 
                 _context.Entry(clienteExistente).State = EntityState.Modified;
             }
             else
             {
-                // Se o cliente não existir, cadastra um novo
-                await _context.ClienteSet.AddAsync(cliente);
+                // Se o cliente não existir, cadastra um novo usando os dados do DTO
+                var novoCliente = new Cliente
+                {
+                    Nome = clienteDTO.Nome,
+                    CPF = clienteDTO.CPF,
+                    Endereco = clienteDTO.Endereco,
+                    Numero_telefone = clienteDTO.Numero_telefone,
+                    Numero_telefone_fixo = clienteDTO.Numero_telefone_fixo,
+                    Email = clienteDTO.Email
+                };
+
+                await _context.ClienteSet.AddAsync(novoCliente);
             }
 
             try
@@ -91,6 +123,7 @@ namespace PassagensAreas.Controllers
 
             return NoContent();
         }
+
 
         // Método para verificar se o cliente existe
         private bool ClienteExists(string cpf)

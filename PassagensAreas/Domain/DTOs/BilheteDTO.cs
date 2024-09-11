@@ -3,7 +3,7 @@
     public class BilheteDTO
     {
         public string NomeCliente { get; set; }
-        public string NumeroVoo { get; set; }
+        public int NumeroVoo { get; set; }
         public string Origem { get; set; }
         public string Destino { get; set; }
         public DateTime DataVoo { get; set; }

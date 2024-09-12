@@ -7,7 +7,6 @@ Uma Api para sistemas de reservas de passagens Aéreas, ele é uma API de um tra
 
 Desenvolvido por [Joas](https://github.com/joashneves)
 
-
 ## Rodando localmente
 
 Clone o projeto
@@ -42,4 +41,8 @@ Instale as migrations e crie no banco de dados MySQL
 ## Autores
 
 - [@Joashneves](https://www.github.com/joashneves)
+- [@Carlos](https://github.com/CRGlg)
+- [@Gellyorge](https://github.com/gellyorge)
+- [@Diogo](https://github.com/DiiogoLR)
+- [@Paulo Roberto](https://github.com/pprett41)
 
